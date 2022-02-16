@@ -70,7 +70,7 @@ class CategoryViewSet(mixins.CreateModelMixin,
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = [IsStaffIsOwnerOrReadOnly]
+    permission_classes = [IsStaffIsOwnerOrReadOnly, IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         title = get_object_or_404(Title, id=self.kwargs['title_id'])
@@ -82,15 +82,21 @@ class ReviewViewSet(viewsets.ModelViewSet):
             title_id=title.id, author_id=self.request.user.id
         )
             
-    
-    
-
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-    queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    permission_classes = [IsStaffIsOwnerOrReadOnly, IsAuthenticatedOrReadOnly]
 
+    def get_queryset(self):
+        review = get_object_or_404(Review, id=self.kwargs['review_id'])
+        return Comment.objects.filter(review_id=review.id)
+
+    def perform_create(self, serializer):
+        review = get_object_or_404(Review, id=self.kwargs['review_id'])
+        serializer.save(
+            review_id=review.id, author_id=self.request.user.id
+        )
 
 @api_view(['POST'])
 def send_code(request):

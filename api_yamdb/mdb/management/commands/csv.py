@@ -7,11 +7,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         con = sqlite3.connect("db.sqlite3") 
         cur = con.cursor()
-        with open('static\\data\\category.csv','r', encoding='utf-8') as fin: 
-            dr = csv.DictReader(fin) 
-            to_db = [(i['id'], i['name'], i['slug']) for i in dr]
-        cur.executemany("INSERT INTO mdb_category (id, name, slug) VALUES (?, ?, ?);", to_db)
-        self.stdout.write(self.style.SUCCESS('Successfully import categories'))
+        # with open('static\\data\\category.csv','r', encoding='utf-8') as fin: 
+        #     dr = csv.DictReader(fin) 
+        #     to_db = [(i['id'], i['name'], i['slug']) for i in dr]
+        # cur.executemany("INSERT INTO mdb_category (id, name, slug) VALUES (?, ?, ?);", to_db)
+        # self.stdout.write(self.style.SUCCESS('Successfully import categories'))
         with open('static\\data\\comments.csv','r', encoding='utf-8') as fin: 
             dr = csv.DictReader(fin) 
             to_db = [(i['id'], i['review_id'], i['text'], i['author'], i['pub_date']) for i in dr]

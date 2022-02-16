@@ -1,5 +1,6 @@
 from mdb.models import Category, Comment, Genre, Review, Title, User
 from rest_framework import serializers
+from .fields import CreatableSlugRelatedField
 
 
 class CreatableSlugRelatedField(serializers.SlugRelatedField):
@@ -40,8 +41,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
 
-    author = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), required=False
+    author = CreatableSlugRelatedField(
+        queryset=User.objects.all(), required=False, slug_field='username'
     )
     title = serializers.PrimaryKeyRelatedField(
         queryset=Title.objects.all(), required=False
@@ -53,6 +54,13 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+
+    author = CreatableSlugRelatedField(
+        queryset=User.objects.all(), required=False, slug_field='username'
+    )
+    review = serializers.PrimaryKeyRelatedField(
+        queryset=Review.objects.all(), required=False
+    )
 
     class Meta:
         fields = '__all__'
