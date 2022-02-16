@@ -1,8 +1,5 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 import csv, sqlite3
-
-
-
 
 
 class Command(BaseCommand):
@@ -44,13 +41,12 @@ class Command(BaseCommand):
             to_db = [(i['id'], i['name'], i['year'], i['category']) for i in dr]
         cur.executemany("INSERT INTO mdb_title (id, name, year, category_id) VALUES (?, ?, ?, ?);", to_db)
         self.stdout.write(self.style.SUCCESS('Successfully import titles'))
+       
+
+        with open('static\\data\\users.csv','r', encoding='utf-8') as fin: 
+            dr = csv.DictReader(fin) 
+            to_db = [(i['id'], i['username'], i['email'], i['role'], i['bio'], i['first_name'], i['last_name'], i['password'], i['is_superuser'], i['is_staff'], i['is_active'], i['date_joined'], i['confirmation_code']) for i in dr]
+        cur.executemany("INSERT INTO mdb_user (id, username, email, role, bio, first_name, last_name, password, is_superuser, is_staff, is_active, date_joined, confirmation_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", to_db)
         con.commit()
         con.close()
-
-        # with open('static\\data\\users.csv','r', encoding='utf-8') as fin: 
-        #     dr = csv.DictReader(fin) 
-        #     to_db = [(i['id'], i['username'], i['email'], i['role'], i['bio'], i['first_name'], i['last_name']) for i in dr]
-        # cur.executemany("INSERT INTO mdb_user (id, username, email, role, bio, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?, ?);", to_db)
-        # con.commit()
-        # con.close()
-        # self.stdout.write(self.style.SUCCESS('Successfully import users'))
+        self.stdout.write(self.style.SUCCESS('Successfully import users'))
