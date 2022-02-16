@@ -7,6 +7,10 @@ from rest_framework_simplejwt.tokens import AccessToken
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
+from rest_framework import viewsets
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 
 from django_filters.rest_framework import DjangoFilterBackend
 from mdb.models import Category, Comment, Genre, Review, Title, User
@@ -21,6 +25,8 @@ from .serializers import (CategorySerializer, CommentSerializer,
                           CheckCodeSerializer)
 
 import random
+                          UserSerializer)
+from .permissions import IsStaffIsOwnerOrReadOnly, IsStaffOrReadOnly
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -63,8 +69,22 @@ class CategoryViewSet(mixins.CreateModelMixin,
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    permission_classes = [IsStaffIsOwnerOrReadOnly]
+
+    def get_queryset(self):
+        title = get_object_or_404(Title, id=self.kwargs['title_id'])
+        return Review.objects.filter(title_id=title.id)
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(Title, id=self.kwargs['title_id'])
+        serializer.save(
+            title_id=title.id, author_id=self.request.user.id
+        )
+            
+    
+    
+
 
 
 class CommentViewSet(viewsets.ModelViewSet):

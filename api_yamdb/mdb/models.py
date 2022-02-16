@@ -3,6 +3,7 @@ import datetime
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models import Avg
 
 now = datetime.datetime.now()
 
@@ -53,8 +54,8 @@ class Title(models.Model):
     year = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(int(now.year))],
         default=None, null=True, blank=True, verbose_name='Год')
-    description = models.TextField(blank=True, verbose_name='Описание')
-    rating = models.IntegerField(blank=True, null=True, verbose_name='Рейтинг')
+    description = models.TextField(null=True, blank=True, verbose_name='Описание')
+    # rating = models.IntegerField(blank=True, null=True, verbose_name='Рейтинг')
     genre = models.ManyToManyField(Genre, verbose_name='Жанр')
     category = models.ForeignKey(
         Category,
@@ -62,6 +63,11 @@ class Title(models.Model):
         blank=True,
         null=True,
         verbose_name='Категория')
+    
+
+    @property
+    def rating(self):
+        return Title.objects.all().aggregate(Avg('rating'))
 
 
 class Review(models.Model):
@@ -76,6 +82,10 @@ class Review(models.Model):
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE,
         related_name='reviews')
+
+    class Meta:
+        # эта команда и не даст повторно голосовать
+        unique_together = ('author', 'title')
 
 
 class Comment(models.Model):
