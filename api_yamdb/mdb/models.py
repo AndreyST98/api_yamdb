@@ -6,12 +6,21 @@ from django.db import models
 class User(AbstractUser):
     bio = models.TextField(
         'Биография',
-        blank=True,
+        blank=True
     )
-    username = models.CharField(max_length=200, unique=True)
-    email = models.EmailField(unique=True)
+    first_name = models.CharField(max_length=150, blank=True)
+    last_name = models.CharField(max_length=150, blank=True)
+    username = models.CharField(max_length=150, unique=True)
+    email = models.EmailField(max_length=254, unique=True)
+    confirmation_code = models.CharField(max_length=6, default='000000')
     USERNAME_FIELD = 'username'
-    # role = 
+    USER_ROLE = (
+        ('user', 'user'),
+        ('moderator', 'moderator'),
+        ('admin', 'admin'),
+    )
+
+    role = models.CharField(max_length=9, choices=USER_ROLE, default='user')
 
 
 class Genre(models.Model):
