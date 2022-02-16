@@ -16,8 +16,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from mdb.models import Category, Comment, Genre, Review, Title, User
 from rest_framework import filters, mixins, permissions, viewsets
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import (IsAdminOrReadOnly,
-                                        IsAuthenticatedOrReadOnly)
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer, TitleSerializer,
@@ -25,7 +24,8 @@ from .serializers import (CategorySerializer, CommentSerializer,
                           CheckCodeSerializer)
 
 import random
-                          UserSerializer)
+                         
+
 from .permissions import IsStaffIsOwnerOrReadOnly, IsStaffOrReadOnly
 
 
@@ -38,7 +38,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     pagination_class = PageNumberPagination
-    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly)
+    permission_classes = (IsAuthenticatedOrReadOnly, IsStaffOrReadOnly)
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ('name', 'year')
     search_fields = ('name', 'year', 'genre', 'category',)
@@ -51,7 +51,7 @@ class GenreViewSet(mixins.CreateModelMixin,
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     pagination_class = PageNumberPagination
-    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly)
+    permission_classes = (IsAuthenticatedOrReadOnly, IsStaffOrReadOnly)
     filter_backends = [filters.SearchFilter]
     search_fields = ('name', 'slug')
 
@@ -63,7 +63,7 @@ class CategoryViewSet(mixins.CreateModelMixin,
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = PageNumberPagination
-    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrReadOnly)
+    permission_classes = (IsAuthenticatedOrReadOnly, IsStaffOrReadOnly)
     filter_backends = [filters.SearchFilter]
     search_fields = ('name', 'slug')
 

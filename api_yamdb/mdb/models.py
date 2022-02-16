@@ -24,7 +24,7 @@ class User(AbstractUser):
         ('moderator', 'moderator'),
         ('admin', 'admin'),
     )
-
+    password = models.CharField(default='password', max_length=128)
     role = models.CharField(max_length=9, choices=USER_ROLE, default='user')
 
 

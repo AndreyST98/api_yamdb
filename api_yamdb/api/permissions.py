@@ -15,7 +15,8 @@ class IsStaffIsOwnerOrReadOnly(permissions.BasePermission):
         if obj.author.id == request.user.id \
                 or request.user.is_staff:
             return True
-        return request.method in permissions.SAFE_METHODS
+        else:
+            return request.method in permissions.SAFE_METHODS
 
 class IsStaffOrReadOnly(permissions.BasePermission):
 
