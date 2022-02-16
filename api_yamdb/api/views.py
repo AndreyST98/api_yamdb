@@ -69,7 +69,7 @@ def send_code(request):
 
 
 @api_view(['POST'])
-def get_jwt_token(request):
+def get_token(request):
     serializer = CheckCodeSerializer(data=request.data)
     if serializer.is_valid():
         email = serializer.data.get('email')
