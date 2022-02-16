@@ -1,6 +1,10 @@
+import datetime
+
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+
+now = datetime.datetime.now()
 
 
 class User(AbstractUser):
@@ -27,15 +31,28 @@ class Genre(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
 
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
+
 
 class Category(models.Model):
+    """Модель категорий произведений."""
     name = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
 
 
 class Title(models.Model):
     name = models.CharField(max_length=200, verbose_name='Произведение')
-    year = models.IntegerField(null=True, blank=True, verbose_name='Год')
+    year = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(int(now.year))],
+        default=None, null=True, blank=True, verbose_name='Год')
     description = models.TextField(blank=True, verbose_name='Описание')
     rating = models.IntegerField(blank=True, null=True, verbose_name='Рейтинг')
     genre = models.ManyToManyField(Genre, verbose_name='Жанр')
