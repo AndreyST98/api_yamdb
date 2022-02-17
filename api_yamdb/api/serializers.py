@@ -1,7 +1,5 @@
-from unicodedata import category
-from rest_framework import serializers
-
 from mdb.models import Category, Comment, Genre, Review, Title, User
+from rest_framework import serializers
 from .fields import CreatableSlugRelatedField
 
 
@@ -14,20 +12,14 @@ class CreatableSlugRelatedField(serializers.SlugRelatedField):
             self.fail('invalid')
 
 class UserSerializer(serializers.ModelSerializer):
-
     class Meta:
-        fields = '__all__'
+        fields = (
+            'first_name', 'last_name', 'username', 'bio', 'email', 'role',)
         model = User
 
 
 class TitleSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()
-    genre = serializers.SlugRelatedField(
-        queryset=Genre.objects.all(), slug_field='slug', many=True
-    )
-    category = serializers.SlugRelatedField(
-        queryset=Category.objects.all(), slug_field='slug'
-    )
 
     def get_rating(self, obj):
         return obj.rating
@@ -38,14 +30,14 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
-
+    """Сериализатор для модели Жанров"""
     class Meta:
         fields = '__all__'
         model = Genre
 
 
 class CategorySerializer(serializers.ModelSerializer):
-
+    """Сериализатор для модели Категорий"""
     class Meta:
         fields = '__all__'
         model = Category
@@ -67,10 +59,17 @@ class CommentSerializer(serializers.ModelSerializer):
     author = CreatableSlugRelatedField(
         queryset=User.objects.all(), required=False, slug_field='username'
     )
-    review = serializers.PrimaryKeyRelatedField(
-        queryset=Review.objects.all(), required=False
-    )
 
     class Meta:
-        fields = '__all__'
+        fields = ('id', 'text', 'author', 'pub_date',)
         model = Comment
+
+
+class SendCodeSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
+
+
+class CheckCodeSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    confirmation_code = serializers.CharField(required=True)
