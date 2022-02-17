@@ -66,8 +66,9 @@ class Title(models.Model):
     
 
     @property
-    def rating(self, **kwargs):
-        self.reviews.all().aggregate(Avg('score'))
+    def rating(self):
+        avg_score = self.reviews.all().aggregate(Avg('score'))
+        return avg_score['score__avg']
 
 
 class Review(models.Model):

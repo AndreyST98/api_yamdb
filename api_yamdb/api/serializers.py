@@ -19,6 +19,10 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
+    rating = serializers.SerializerMethodField()
+
+    def get_rating(self, obj):
+        return obj.rating
 
     class Meta:
         fields = '__all__'
