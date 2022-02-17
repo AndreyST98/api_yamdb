@@ -44,12 +44,9 @@ class ReviewSerializer(serializers.ModelSerializer):
     author = CreatableSlugRelatedField(
         queryset=User.objects.all(), required=False, slug_field='username'
     )
-    title = serializers.PrimaryKeyRelatedField(
-        queryset=Title.objects.all(), required=False
-    )
 
     class Meta:
-        fields = '__all__'
+        fields = ('id', 'text', 'author', 'score', 'pub_date',)
         model = Review
 
 
@@ -58,12 +55,9 @@ class CommentSerializer(serializers.ModelSerializer):
     author = CreatableSlugRelatedField(
         queryset=User.objects.all(), required=False, slug_field='username'
     )
-    review = serializers.PrimaryKeyRelatedField(
-        queryset=Review.objects.all(), required=False
-    )
 
     class Meta:
-        fields = '__all__'
+        fields = ('id', 'text', 'author', 'pub_date',)
         model = Comment
 
 
