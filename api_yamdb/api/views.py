@@ -81,6 +81,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         serializer.save(
             title_id=title.id, author_id=self.request.user.id
         )
+        title.rating += self.request.data['score']
             
 
 
