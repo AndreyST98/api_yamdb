@@ -20,6 +20,10 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
+    rating = serializers.SerializerMethodField()
+
+    def get_rating(self, obj):
+        return obj.rating
 
     class Meta:
         fields = '__all__'
@@ -45,12 +49,9 @@ class ReviewSerializer(serializers.ModelSerializer):
     author = CreatableSlugRelatedField(
         queryset=User.objects.all(), required=False, slug_field='username'
     )
-    title = serializers.PrimaryKeyRelatedField(
-        queryset=Title.objects.all(), required=False
-    )
 
     class Meta:
-        fields = '__all__'
+        fields = ('id', 'text', 'author', 'score', 'pub_date',)
         model = Review
 
 

@@ -50,7 +50,8 @@ class Title(models.Model):
 
     @property
     def rating(self):
-        return Title.objects.all().aggregate(Avg('rating'))
+        avg_score = self.reviews.all().aggregate(Avg('score'))
+        return avg_score['score__avg']
 
 
 class Review(models.Model):
