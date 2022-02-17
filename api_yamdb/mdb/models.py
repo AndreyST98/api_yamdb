@@ -38,7 +38,6 @@ class Title(models.Model):
     name = models.CharField(max_length=200, verbose_name='Произведение')
     year = models.IntegerField(null=True, blank=True, verbose_name='Год')
     description = models.TextField(null=True, blank=True, verbose_name='Описание')
-    # rating = models.IntegerField(blank=True, null=True, verbose_name='Рейтинг')
     genre = models.ManyToManyField(Genre, verbose_name='Жанр')
     category = models.ForeignKey(
         Category,
@@ -46,7 +45,6 @@ class Title(models.Model):
         blank=True,
         null=True,
         verbose_name='Категория')
-    
 
     @property
     def rating(self):
