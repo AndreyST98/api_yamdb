@@ -1,3 +1,4 @@
+from unicodedata import category
 from rest_framework import viewsets, status
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
@@ -9,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
-from rest_framework.permissions import (IsAuthenticated,
+from rest_framework.permissions import (IsAuthenticated, 
                                         IsAuthenticatedOrReadOnly)
 
 from django_filters.rest_framework import DjangoFilterBackend
@@ -19,9 +20,9 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 
 from .serializers import (CategorySerializer, CommentSerializer,
-                          GenreSerializer, ReviewSerializer, TitleSerializer,
+                          GenreSerializer, ReviewSerializer, 
                           UserSerializer, SendCodeSerializer,
-                          CheckCodeSerializer)
+                          CheckCodeSerializer, TitleGetSerializer, TitlePostSerializer)
 
 import random
                          
@@ -36,12 +37,16 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
-    serializer_class = TitleSerializer
     pagination_class = PageNumberPagination
-    permission_classes = (IsAuthenticatedOrReadOnly, IsStaffOrReadOnly)
+    permission_classes = [IsStaffOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ('name', 'year')
+    filterset_fields = ('name', 'year', 'genre', 'category',)
     search_fields = ('name', 'year', 'genre', 'category',)
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve' or self.action == 'list':
+            return TitleGetSerializer
+        return TitlePostSerializer
 
 
 class GenreViewSet(mixins.CreateModelMixin,

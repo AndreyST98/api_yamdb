@@ -1,3 +1,6 @@
+from unicodedata import category
+
+from numpy import require
 from mdb.models import Category, Comment, Genre, Review, Title, User
 from rest_framework import serializers
 from .fields import CreatableSlugRelatedField
@@ -16,17 +19,12 @@ class UserSerializer(serializers.ModelSerializer):
         fields = (
             'first_name', 'last_name', 'username', 'bio', 'email', 'role',)
         model = User
+    
 
-
-class TitleSerializer(serializers.ModelSerializer):
-    rating = serializers.SerializerMethodField()
-
-    def get_rating(self, obj):
-        return obj.rating
-
+class CategorySerializer(serializers.ModelSerializer):
     class Meta:
-        fields = '__all__'
-        model = Title
+        fields = ('name', 'slug',)
+        model = Category
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -36,11 +34,34 @@ class GenreSerializer(serializers.ModelSerializer):
         model = Genre
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    """Сериализатор для модели Категорий"""
+class TitleGetSerializer(serializers.ModelSerializer):
+    rating = serializers.SerializerMethodField()
+    genre = GenreSerializer(required=True, many=True)
+    category = CategorySerializer(required = True)
+
+    def get_rating(self, obj):
+        return obj.rating
+    
     class Meta:
         fields = '__all__'
-        model = Category
+        model = Title
+        depth = 1
+
+class TitlePostSerializer(serializers.ModelSerializer):
+    rating = serializers.SerializerMethodField()
+    genre = serializers.SlugRelatedField(
+        queryset=Genre.objects.all(), slug_field='slug', many=True, required=True
+    )
+    category = serializers.SlugRelatedField(
+        queryset=Category.objects.all(), slug_field='slug', required=True
+    )
+
+    def get_rating(self, obj):
+        return obj.rating
+    
+    class Meta:
+        fields = '__all__'
+        model = Title
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -52,7 +73,15 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'text', 'author', 'score', 'pub_date',)
         model = Review
+    
+    def validate(self, data): 
+        if data['following'].id == self.context['request'].user.id: 
 
+            raise serializers.ValidationError( 
+
+                'нельзя подписаться на самого себя') 
+
+        return data 
 
 class CommentSerializer(serializers.ModelSerializer):
 

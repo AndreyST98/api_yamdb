@@ -33,6 +33,9 @@ class Category(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
 
+    def __str__(self):
+        return self.slug
+
 
 class Title(models.Model):
     name = models.CharField(max_length=200, verbose_name='Произведение')
@@ -67,7 +70,11 @@ class Review(models.Model):
 
     class Meta:
         # эта команда и не даст повторно голосовать
-        unique_together = ('author', 'title')
+         constraints = [ 
+            models.UniqueConstraint( 
+                fields=['author', 'title'], name='unique.review' 
+            ) 
+        ]
 
 
 class Comment(models.Model):
