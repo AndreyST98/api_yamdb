@@ -26,10 +26,10 @@ INSTALLED_APPS = [
     'djoser',
     'django_filters',
     'api',
-    'mdb',
+    'reviews',
 ]
 
-AUTH_USER_MODEL = 'mdb.User'
+AUTH_USER_MODEL = 'reviews.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -138,7 +138,7 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
 
-AUTH_USER_MODEL = 'mdb.User'
+AUTH_USER_MODEL = 'reviews.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [

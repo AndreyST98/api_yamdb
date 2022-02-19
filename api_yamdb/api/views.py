@@ -13,7 +13,7 @@ from rest_framework.permissions import (IsAuthenticated, AllowAny,
                                         IsAuthenticatedOrReadOnly)
 
 from django_filters.rest_framework import DjangoFilterBackend
-from mdb.models import Category, Comment, Genre, Review, Title, User
+from reviews.models import Category, Comment, Genre, Review, Title, User
 from rest_framework import filters, mixins, viewsets
 from rest_framework.pagination import PageNumberPagination
 
@@ -71,6 +71,7 @@ class CategoryViewSet(mixins.CreateModelMixin,
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
+    pagination_class = PageNumberPagination
     permission_classes = [IsStaffIsOwnerOrReadOnly, IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):

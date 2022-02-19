@@ -1,7 +1,7 @@
-from mdb.models import Category, Comment, Genre, Review, Title, User
+from reviews.models import Category, Comment, Genre, Review, Title, User
 from rest_framework import serializers
 from .fields import CreatableSlugRelatedField
-
+from rest_framework.generics import get_object_or_404
 
 class CreatableSlugRelatedField(serializers.SlugRelatedField):
 
@@ -48,14 +48,14 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'text', 'author', 'score', 'pub_date',)
         model = Review
     
-    def validate(self, data): 
-        if data['following'].id == self.context['request'].user.id: 
-
-            raise serializers.ValidationError( 
-
-                'нельзя подписаться на самого себя') 
-
-        return data 
+    def validate(self, data):
+        title_id = self.context['view'].kwargs.get('title_id')
+        title = get_object_or_404(Title, id=title_id)
+        request = self.context['request']
+        if self.context['request'].method == 'POST':
+            if Review.objects.filter(title=title, author=request.user).exists():
+                raise serializers.ValidationError('Нельзя оставить больше одного ревью к одному произведению')
+        return data
 
 class CommentSerializer(serializers.ModelSerializer):
 
@@ -71,6 +71,10 @@ class CommentSerializer(serializers.ModelSerializer):
 class TitleViewSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(many=True, read_only=True)
     category = CategorySerializer(read_only=True)
+    rating = serializers.SerializerMethodField()
+
+    def get_rating(self, obj):
+        return obj.rating
 
     class Meta:
         fields = '__all__'

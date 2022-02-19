@@ -114,7 +114,6 @@ class Review(models.Model):
         related_name='reviews')
 
     class Meta:
-        # эта команда и не даст повторно голосовать
          constraints = [ 
             models.UniqueConstraint( 
                 fields=['author', 'title'], name='unique.review' 
