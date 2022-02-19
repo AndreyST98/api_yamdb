@@ -3,7 +3,7 @@ from rest_framework import routers
 
 from .views import (CategoryViewSet, CommentViewSet, GenreViewSet,
                     ReviewViewSet, TitleViewSet, UserViewSet,
-                    get_token, send_code, UserInfo)
+                    signup, login)
 
 
 router = routers.DefaultRouter()
@@ -20,11 +20,11 @@ router.register(
 )
 
 urlpatterns = [
-    path('v1/', include('djoser.urls')),
-    path('v1/', include('djoser.urls.jwt')),
-    path('v1/auth/signup/', send_code),
-    path('v1/auth/token/', get_token),
-    path('v1/users/me/', UserInfo.as_view()),
+    # раскоментить если всё сломалось
+    ## path('v1/', include('djoser.urls')),
+    ## path('v1/', include('djoser.urls.jwt')),
+    path('email/', signup, name='signup'),
+    path('token/', login, name='login'),
     path('v1/', include(router.urls)),
-    
+
 ]

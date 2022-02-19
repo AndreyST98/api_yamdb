@@ -1,11 +1,39 @@
 import datetime
 
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Avg
 
 now = datetime.datetime.now()
+
+
+class CustomUserManager(BaseUserManager):
+    def create_user(self, username, email, password=None, **kwargs):
+        if not username:
+            raise ValueError('Нужно указать название учётной записи')
+        if username == 'me':
+            raise ValueError('Такую учётную запись нельзя создать')
+        if not email:
+            raise ValueError('Не заполнен e-mail')
+        user = self.model(username=username, **kwargs)
+        user = self.model(email=email, **kwargs)
+        user.set_password(password)
+        user.save()
+        return user
+
+    def create_superuser(self, username, password, **kwargs):
+        if not username:
+            raise ValueError('Нужно указать название учётной записи')
+        if username == 'me':
+            raise ValueError('Такую учётную запись нельзя создать')
+        if not password:
+            raise ValueError('Не заполнен пароль')
+        user = self.model(
+            username=username, is_staff=True, is_superuser=True, **kwargs)
+        user.set_password(password)
+        user.save()
+        return user
 
 
 class User(AbstractUser):
@@ -17,7 +45,6 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=150, blank=True)
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(max_length=254, unique=True)
-    confirmation_code = models.CharField(max_length=6, default='000000')
     USERNAME_FIELD = 'username'
     USER_ROLE = (
         ('user', 'user'),
@@ -26,6 +53,8 @@ class User(AbstractUser):
     )
     password = models.CharField(default='password', max_length=128)
     role = models.CharField(max_length=9, choices=USER_ROLE, default='user')
+
+    objects = CustomUserManager()
 
 
 class Genre(models.Model):
