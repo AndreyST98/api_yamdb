@@ -55,7 +55,6 @@ class Title(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(int(now.year))],
         default=None, null=True, blank=True, verbose_name='Год')
     description = models.TextField(null=True, blank=True, verbose_name='Описание')
-    # rating = models.IntegerField(blank=True, null=True, verbose_name='Рейтинг')
     genre = models.ManyToManyField(Genre, verbose_name='Жанр')
     category = models.ForeignKey(
         Category,
@@ -63,7 +62,6 @@ class Title(models.Model):
         blank=True,
         null=True,
         verbose_name='Категория')
-    
 
     @property
     def rating(self):
@@ -86,7 +84,11 @@ class Review(models.Model):
 
     class Meta:
         # эта команда и не даст повторно голосовать
-        unique_together = ('author', 'title')
+         constraints = [ 
+            models.UniqueConstraint( 
+                fields=['author', 'title'], name='unique.review' 
+            ) 
+        ]
 
 
 class Comment(models.Model):

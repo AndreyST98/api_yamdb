@@ -16,7 +16,12 @@ class UserSerializer(serializers.ModelSerializer):
         fields = (
             'first_name', 'last_name', 'username', 'bio', 'email', 'role',)
         model = User
+    
 
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('name', 'slug',)
+        model = Category
 
 class GenreSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Жанров"""
@@ -41,7 +46,15 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'text', 'author', 'score', 'pub_date',)
         model = Review
+    
+    def validate(self, data): 
+        if data['following'].id == self.context['request'].user.id: 
 
+            raise serializers.ValidationError( 
+
+                'нельзя подписаться на самого себя') 
+
+        return data 
 
 class CommentSerializer(serializers.ModelSerializer):
 
@@ -80,4 +93,5 @@ class SendCodeSerializer(serializers.Serializer):
 
 class CheckCodeSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
+    username = serializers.CharField(required=True)
     confirmation_code = serializers.CharField(required=True)
