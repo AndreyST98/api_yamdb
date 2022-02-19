@@ -12,11 +12,11 @@ from rest_framework import permissions
 class IsStaffIsOwnerOrReadOnly(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
-        if obj.author.id == request.user.id \
-                or request.user.is_staff:
+        if request.method in permissions.SAFE_METHODS \
+                or obj.author.id == request.user.id \
+                or request.user.is_staff \
+                or request.user.role == 'moderator':
             return True
-        else:
-            return request.method in permissions.SAFE_METHODS
 
 class IsStaffOrReadOnly(permissions.BasePermission):
 
