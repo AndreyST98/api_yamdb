@@ -43,8 +43,8 @@ class Title(models.Model):
     year = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(int(now.year))],
         default=None, null=True, blank=True, verbose_name='Год')
-    description = models.TextField(blank=True, verbose_name='Описание')
     rating = models.IntegerField(blank=True, null=True, verbose_name='Рейтинг')
+    description = models.TextField(blank=True, verbose_name='Описание')
     genre = models.ManyToManyField(Genre, verbose_name='Жанр')
     category = models.ForeignKey(
         Category,
