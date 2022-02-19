@@ -1,9 +1,10 @@
+import uuid
 from rest_framework import viewsets, status
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import get_object_or_404
@@ -123,17 +124,15 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 @api_view(['POST', ])
+@permission_classes([AllowAny])
 def signup(request):
-    username = request.POST['username']
-    email = request.POST['email']
-    if not User.objects.filter(username=username).exists():
-        user = User.objects.create(username=username, email=email)
-    else:
-        user = User.objects.filter(username=username).first()
-    code = default_token_generator.make_token(user)
+    username = request.data.get('username')
+    email = request.data.get('email')
+    confirmation_code = str(uuid.uuid4())
+    User.objects.create(username=username, email=email, confirmation_code=confirmation_code)
     send_mail(
         subject='Код подтверждения на Yamdb.ru',
-        message=f'"confirmation_code": "{code}"',
+        message=f'"confirmation_code": "{confirmation_code}"',
         from_email='yamdb@yamdb.ru',
         recipient_list=[email, ],
         fail_silently=True
@@ -142,18 +141,11 @@ def signup(request):
 
 
 @api_view(['POST', ])
+@permission_classes([AllowAny])
 def login(request):
-    username = request.POST['username']
-    confirmation_code = request.POST['confirmation_code']
-    user = User.objects.filter(username=username).first()
-    data = {'field_name': []}
-    if user is None:
-        data['field_name'].append('username')
-        data['field_name'].append('email')
-    if not default_token_generator.check_token(user, confirmation_code):
-        data['field_name'].append('confirmation_code')
-    if len(data['field_name']) != 0:
-        return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+    username = request.data.get('username')
+    confirmation_code = request.data.get('confirmation_code')
+    user = get_object_or_404(User.objects.filter(username=username, confirmation_code=confirmation_code))
     token = RefreshToken.for_user(user)
     return Response(
         data={'token': str(token.access_token)}, status=status.HTTP_200_OK)

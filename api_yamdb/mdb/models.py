@@ -44,6 +44,7 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=150, blank=True)
     last_name = models.CharField(max_length=150, blank=True)
     username = models.CharField(max_length=150, unique=True)
+
     email = models.EmailField(max_length=254, unique=True)
     USERNAME_FIELD = 'username'
     USER_ROLE = (
@@ -53,7 +54,7 @@ class User(AbstractUser):
     )
     password = models.CharField(default='password', max_length=128)
     role = models.CharField(max_length=9, choices=USER_ROLE, default='user')
-
+    confirmation_code = models.CharField(max_length=6, default='000000')
     objects = CustomUserManager()
 
 
