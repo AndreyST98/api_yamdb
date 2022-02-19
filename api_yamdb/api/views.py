@@ -1,11 +1,10 @@
 from rest_framework import viewsets, status
-from django.contrib.auth.tokens import default_token_generator
+from rest_framework_simplejwt.tokens import AccessToken
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.permissions import (IsAuthenticated,
@@ -19,9 +18,12 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer, TitleSerializer,
-                          UserSerializer)
+                          UserSerializer, SendCodeSerializer,
+                          CheckConfirmationCodeSerializer)
 
 from .permissions import IsStaffIsOwnerOrReadOnly, IsStaffOrReadOnly
+
+import random
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -117,36 +119,34 @@ class UserViewSet(viewsets.ModelViewSet):
 
 @api_view(['POST', ])
 def signup(request):
-    username = request.POST['username']
-    email = request.POST['email']
-    if not User.objects.filter(username=username).exists():
-        user = User.objects.create(username=username, email=email)
-    else:
-        user = User.objects.filter(username=username).first()
-    code = default_token_generator.make_token(user)
-    send_mail(
-        subject='Код подтверждения на Yamdb.ru',
-        message=f'"confirmation_code": "{code}"',
-        from_email='yamdb@yamdb.ru',
-        recipient_list=[email, ],
-        fail_silently=True
-    )
-    return Response(data={'email': email}, status=status.HTTP_200_OK)
+    serializer = SendCodeSerializer(data=request.data)
+    username = request.data.get('username', False)
+    email = request.data.get('email', False)
+    if serializer.is_valid():
+        confirmation_code = ''.join(map(str, random.sample(range(10), 6)))
+        user = User.objects.filter(username=username).exists()
+        if not user:
+            User.objects.create_user(username=username, email=email)
+        User.objects.filter(username=username).update(
+            confirmation_code=confirmation_code)
+        mail_subject = 'Код подтверждения на yamdb.ru'
+        message = f'Ваш код подтверждения: {confirmation_code}'
+        send_mail(mail_subject, message, 'yamdb@yamdb.ru', [email])
+        return Response(
+            f'Код отправлен на адрес {email}', status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST', ])
 def login(request):
-    username = request.POST['username']
-    confirmation_code = request.POST['confirmation_code']
-    user = User.objects.filter(username=username).first()
-    data = {'field_name': []}
-    if user is None:
-        data['field_name'].append('username')
-        data['field_name'].append('email')
-    if not default_token_generator.check_token(user, confirmation_code):
-        data['field_name'].append('confirmation_code')
-    if len(data['field_name']) != 0:
-        return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
-    token = RefreshToken.for_user(user)
-    return Response(
-        data={'token': str(token.access_token)}, status=status.HTTP_200_OK)
+    serializer = CheckConfirmationCodeSerializer(data=request.data)
+    if serializer.is_valid():
+        username = request.data.get('username')
+        confirmation_code = serializer.data.get('confirmation_code')
+        user = get_object_or_404(User, username=username)
+        if confirmation_code == user.confirmation_code:
+            token = AccessToken.for_user(user)
+            return Response({'token': f'{token}'}, status=status.HTTP_200_OK)
+        return Response({'confirmation_code': 'Неверный код подтверждения'},
+                        status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

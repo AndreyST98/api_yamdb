@@ -64,3 +64,12 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'text', 'author', 'pub_date',)
         model = Comment
+
+
+class SendCodeSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+
+
+class CheckConfirmationCodeSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    confirmation_code = serializers.CharField(required=True)

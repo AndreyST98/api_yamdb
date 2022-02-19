@@ -23,7 +23,7 @@ urlpatterns = [
     # раскоментить если всё сломалось
     ## path('v1/', include('djoser.urls')),
     ## path('v1/', include('djoser.urls.jwt')),
-    path('email/', signup, name='signup'),
+    path('signup/', signup, name='signup'),
     path('token/', login, name='login'),
     path('v1/', include(router.urls)),
 
