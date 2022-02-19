@@ -1,6 +1,3 @@
-from unicodedata import category
-
-from numpy import require
 from mdb.models import Category, Comment, Genre, Review, Title, User
 from rest_framework import serializers
 from .fields import CreatableSlugRelatedField
@@ -26,6 +23,11 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ('name', 'slug',)
         model = Category
 
+class TitleSerializer(serializers.ModelSerializer):
+    rating = serializers.SerializerMethodField()
+
+    def get_rating(self, obj):
+        return obj.rating
 
 class GenreSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Жанров"""
@@ -56,8 +58,6 @@ class TitlePostSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all(), slug_field='slug', required=True
     )
 
-    def get_rating(self, obj):
-        return obj.rating
     
     class Meta:
         fields = '__all__'

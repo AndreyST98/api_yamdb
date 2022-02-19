@@ -1,4 +1,3 @@
-from unicodedata import category
 from rest_framework import viewsets, status
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
