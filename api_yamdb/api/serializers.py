@@ -18,29 +18,18 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
 
 
-class TitleSerializer(serializers.ModelSerializer):
-    rating = serializers.SerializerMethodField()
-
-    def get_rating(self, obj):
-        return obj.rating
-
-    class Meta:
-        fields = '__all__'
-        model = Title
-
-
 class GenreSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Жанров"""
     class Meta:
-        fields = '__all__'
         model = Genre
+        exclude = ('id',)
 
 
 class CategorySerializer(serializers.ModelSerializer):
     """Сериализатор для модели Категорий"""
     class Meta:
-        fields = '__all__'
         model = Category
+        exclude = ('id',)
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -64,6 +53,25 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ('id', 'text', 'author', 'pub_date',)
         model = Comment
 
+
+class TitleViewSerializer(serializers.ModelSerializer):
+    genre = GenreSerializer(many=True, read_only=True)
+    category = CategorySerializer(read_only=True)
+
+    class Meta:
+        fields = '__all__'
+        model = Title
+
+
+class TitlePostSerializer(serializers.ModelSerializer):
+    genre = serializers.SlugRelatedField(slug_field='slug', many=True,
+                                         queryset=Genre.objects.all())
+    category = serializers.SlugRelatedField(slug_field='slug',
+                                            queryset=Category.objects.all())
+
+    class Meta:
+        fields = '__all__'
+        model = Title
 
 class SendCodeSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
