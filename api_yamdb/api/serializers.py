@@ -87,12 +87,12 @@ class TitlePostSerializer(serializers.ModelSerializer):
         fields = '__all__'
         model = Title
 
-# class SendCodeSerializer(serializers.Serializer):
-#     username = serializers.CharField(required=True)
-#     email = serializers.EmailField(required=True)
+class SendCodeSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
 
 
-# class CheckCodeSerializer(serializers.Serializer):
-#     email = serializers.EmailField(required=True)
-#     username = serializers.CharField(required=True)
-#     confirmation_code = serializers.CharField(required=True)
+class CheckCodeSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    username = serializers.CharField(required=True)
+    confirmation_code = serializers.CharField(required=True)

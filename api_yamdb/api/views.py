@@ -1,14 +1,14 @@
 import uuid
 from rest_framework import viewsets, status
-from django.contrib.auth.tokens import default_token_generator
+from rest_framework_simplejwt.tokens import AccessToken
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import (IsAuthenticated, AllowAny,
                                         IsAuthenticatedOrReadOnly)
 
@@ -22,8 +22,11 @@ from .serializers import (CategorySerializer, CommentSerializer,
                           TitlePostSerializer, TitleViewSerializer,
                           UserSerializer, 
                           GenreSerializer, ReviewSerializer,
-                          UserSerializer)
+                          UserSerializer, SendCodeSerializer,
+                          CheckCodeSerializer)
 from .permissions import IsStaffIsOwnerOrReadOnly, IsStaffOrReadOnly
+import random
+
 import random
 
 
