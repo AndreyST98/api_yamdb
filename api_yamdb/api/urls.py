@@ -21,10 +21,10 @@ router.register(
 
 urlpatterns = [
     # раскоментить если всё сломалось
-    ## path('v1/', include('djoser.urls')),
-    ## path('v1/', include('djoser.urls.jwt')),
-    path('email/', signup, name='signup'),
-    path('token/', login, name='login'),
+    # path('v1/', include('djoser.urls')),
+    # path('v1/', include('djoser.urls.jwt')),
+    path('v1/auth/signup/', signup, name='signup'),
+    path('v1/auth/token/', login, name='login'),
     path('v1/', include(router.urls)),
 
 ]

@@ -7,11 +7,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         con = sqlite3.connect("db.sqlite3") 
         cur = con.cursor()
-        # with open('static\\data\\category.csv','r', encoding='utf-8') as fin: 
-        #     dr = csv.DictReader(fin) 
-        #     to_db = [(i['id'], i['name'], i['slug']) for i in dr]
-        # cur.executemany("INSERT INTO mdb_category (id, name, slug) VALUES (?, ?, ?);", to_db)
-        # self.stdout.write(self.style.SUCCESS('Successfully import categories'))
+        with open('static\\data\\category.csv','r', encoding='utf-8') as fin: 
+            dr = csv.DictReader(fin) 
+            to_db = [(i['id'], i['name'], i['slug']) for i in dr]
+        cur.executemany("INSERT INTO mdb_category (id, name, slug) VALUES (?, ?, ?);", to_db)
+        self.stdout.write(self.style.SUCCESS('Successfully import categories'))
         with open('static\\data\\comments.csv','r', encoding='utf-8') as fin: 
             dr = csv.DictReader(fin) 
             to_db = [(i['id'], i['review_id'], i['text'], i['author'], i['pub_date']) for i in dr]
@@ -45,8 +45,8 @@ class Command(BaseCommand):
 
         with open('static\\data\\users.csv','r', encoding='utf-8') as fin: 
             dr = csv.DictReader(fin) 
-            to_db = [(i['id'], i['username'], i['email'], i['role'], i['bio'], i['first_name'], i['last_name'], i['password'], i['is_superuser'], i['is_staff'], i['is_active'], i['date_joined'], i['confirmation_code']) for i in dr]
-        cur.executemany("INSERT INTO mdb_user (id, username, email, role, bio, first_name, last_name, password, is_superuser, is_staff, is_active, date_joined, confirmation_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", to_db)
+            to_db = [(i['id'], i['username'], i['email'], i['role'], i['bio'], i['first_name'], i['last_name'], i['password'], i['is_superuser'], i['is_staff'], i['is_active'], i['date_joined']) for i in dr]
+        cur.executemany("INSERT INTO mdb_user (id, username, email, role, bio, first_name, last_name, password, is_superuser, is_staff, is_active, date_joined) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", to_db)
         con.commit()
         con.close()
         self.stdout.write(self.style.SUCCESS('Successfully import users'))
