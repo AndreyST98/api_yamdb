@@ -4,12 +4,13 @@ from .fields import CreatableSlugRelatedField
 
 
 class CreatableSlugRelatedField(serializers.SlugRelatedField):
-    
+
     def to_internal_value(self, data):
         try:
             return self.get_queryset().get(id=data)
         except (TypeError, ValueError):
             self.fail('invalid')
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -86,12 +87,12 @@ class TitlePostSerializer(serializers.ModelSerializer):
         fields = '__all__'
         model = Title
 
-class SendCodeSerializer(serializers.Serializer):
-    username = serializers.CharField(required=True)
-    email = serializers.EmailField(required=True)
+# class SendCodeSerializer(serializers.Serializer):
+#     username = serializers.CharField(required=True)
+#     email = serializers.EmailField(required=True)
 
 
-class CheckCodeSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
-    username = serializers.CharField(required=True)
-    confirmation_code = serializers.CharField(required=True)
+# class CheckCodeSerializer(serializers.Serializer):
+#     email = serializers.EmailField(required=True)
+#     username = serializers.CharField(required=True)
+#     confirmation_code = serializers.CharField(required=True)
