@@ -60,13 +60,14 @@ class User(AbstractUser):
 
 
 class Genre(models.Model):
+    """Модель жанров произведений."""
     name = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
 
     class Meta:
         ordering = ('name',)
-        verbose_name = 'Жанр'
-        verbose_name_plural = 'Жанры'
+        verbose_name = 'genre'
+        verbose_name_plural = 'genres'
 
 
 class Category(models.Model):
@@ -76,23 +77,32 @@ class Category(models.Model):
 
     class Meta:
         ordering = ('name',)
-        verbose_name = 'Категория'
-        verbose_name_plural = 'Категории'
+        verbose_name = 'category'
+        verbose_name_plural = 'categories'
 
 
 class Title(models.Model):
-    name = models.CharField(max_length=200, verbose_name='Произведение')
+    name = models.CharField(verbose_name='Titles',
+                            db_index=True, max_length=100)
     year = models.IntegerField(
+        verbose_name='year',
         validators=[MinValueValidator(1), MaxValueValidator(int(now.year))],
-        default=None, null=True, blank=True, verbose_name='Год')
-    description = models.TextField(null=True, blank=True, verbose_name='Описание')
-    genre = models.ManyToManyField(Genre, verbose_name='Жанр')
+        default=None
+    )
+    description = models.TextField(verbose_name='Description')
+    genre = models.ManyToManyField(Genre, related_name='genres', blank=True)
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
+        related_name='categories',
         blank=True,
-        null=True,
-        verbose_name='Категория')
+        null=True
+    )
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Title'
+        verbose_name_plural = 'Titles'
 
     @property
     def rating(self):
@@ -114,11 +124,9 @@ class Review(models.Model):
         related_name='reviews')
 
     class Meta:
-         constraints = [ 
-            models.UniqueConstraint( 
-                fields=['author', 'title'], name='unique.review' 
-            ) 
-        ]
+        constraints = [models.UniqueConstraint(
+                       fields=['author', 'title'], name='unique.review')
+                       ]
 
 
 class Comment(models.Model):
