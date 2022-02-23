@@ -22,6 +22,13 @@ from .serializers import (CategorySerializer, CheckCodeSerializer,
                           TitleViewSerializer, UserSerializer)
 
 
+class CustomViewSet(mixins.CreateModelMixin,
+                    mixins.DestroyModelMixin,
+                    mixins.ListModelMixin,
+                    viewsets.GenericViewSet):
+    pass
+
+
 class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitlePostSerializer
     queryset = Title.objects.all()
@@ -36,10 +43,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitlePostSerializer
 
 
-class GenreViewSet(mixins.CreateModelMixin,
-                   mixins.ListModelMixin,
-                   mixins.DestroyModelMixin,
-                   viewsets.GenericViewSet):
+class GenreViewSet(CustomViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     pagination_class = PageNumberPagination
@@ -49,10 +53,7 @@ class GenreViewSet(mixins.CreateModelMixin,
     lookup_field = 'slug'
 
 
-class CategoryViewSet(mixins.CreateModelMixin,
-                      mixins.ListModelMixin,
-                      mixins.DestroyModelMixin,
-                      viewsets.GenericViewSet):
+class CategoryViewSet(CustomViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = PageNumberPagination
@@ -64,7 +65,6 @@ class CategoryViewSet(mixins.CreateModelMixin,
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    # pagination_class = PageNumberPagination
     permission_classes = [IsStaffIsOwnerOrReadOnly, IsStaffOrReadOnly]
 
     def get_queryset(self):

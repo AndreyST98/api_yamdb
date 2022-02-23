@@ -1,11 +1,17 @@
 import datetime
 
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Avg
 
 now = datetime.datetime.now()
+
+
+def validator(composition_year):
+    if composition_year > int(now.year):
+        raise ValidationError('Извините, ваш год из будущего')
 
 
 class CustomUserManager(BaseUserManager):
@@ -82,19 +88,17 @@ class Category(models.Model):
 
 
 class Title(models.Model):
-    name = models.CharField(verbose_name='Titles',
+    name = models.CharField(verbose_name='name',
                             db_index=True, max_length=100)
-    year = models.IntegerField(
-        verbose_name='year',
-        validators=[MinValueValidator(1), MaxValueValidator(int(now.year))],
-        default=None
-    )
-    description = models.TextField(verbose_name='Description')
-    genre = models.ManyToManyField(Genre, related_name='genres', blank=True)
+    year = models.IntegerField('composition_year',
+                               validators=[validator],
+                               default=None)
+    description = models.TextField(verbose_name='description')
+    genre = models.ManyToManyField(Genre, related_name='titles', blank=True)
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
-        related_name='categories',
+        related_name='titles',
         blank=True,
         null=True
     )
