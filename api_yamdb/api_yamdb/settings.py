@@ -1,29 +1,24 @@
 import os
 from datetime import timedelta
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'p&l%385148kslhtyn^##a1)ilz@4zqj=rq&agdol^##zgl9(vs'
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
 
-# Application definition
-
 INSTALLED_APPS = [
-    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
+    'rest_framework',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'djoser',
+    'rest_framework_simplejwt',
     'django_filters',
     'api',
     'reviews',
@@ -63,8 +58,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'api_yamdb.wsgi.application'
 
 
-# Database
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -72,8 +65,6 @@ DATABASES = {
     }
 }
 
-
-# Password validation
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -90,33 +81,31 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-REST_FRAMEWORK = { 
+REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
 
-    'DEFAULT_PERMISSION_CLASSES': [ 
+    'DEFAULT_PERMISSION_CLASSES': [
 
-        'rest_framework.permissions.AllowAny', 
+        'rest_framework.permissions.AllowAny',
 
-    ], 
-    
-    'DEFAULT_AUTHENTICATION_CLASSES': [ 
+    ],
 
-        'rest_framework_simplejwt.authentication.JWTAuthentication', 
+    'DEFAULT_AUTHENTICATION_CLASSES': [
 
-    ], 
-} 
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
 
- 
+    ],
+}
 
-SIMPLE_JWT = { 
 
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=7), 
+SIMPLE_JWT = {
 
-    'AUTH_HEADER_TYPES': ('Bearer',), 
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
 
-} 
-# Internationalization
+    'AUTH_HEADER_TYPES': ('Bearer',),
+
+}
 
 LANGUAGE_CODE = 'en-us'
 
@@ -129,20 +118,18 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
 
 AUTH_USER_MODEL = 'reviews.User'
 
-
 SIMPLE_JWT = {
-    # Устанавливаем срок жизни токена
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+
+ADMIN_EMAIL = 'yamdb@yamdb.ru'
